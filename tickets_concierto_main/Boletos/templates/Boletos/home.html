@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Catálogo | Tickets Concierto</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-dark bg-dark px-4">
+        <span class="navbar-brand fw-bold text-warning">Tickets Concierto</span>
+        <div class="d-flex align-items-center gap-3 text-white">
+            <span>Hola, <strong>{{ request.user.username }}</strong></span>
+            <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm">Cerrar Sesión</a>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        <h2 class="mb-4 fw-bold">Conciertos Disponibles</h2>
+        <div class="row g-4">
+            {% for concierto in conciertos %}
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <span class="badge bg-primary mb-2">{{ concierto.categoria.nombre }}</span>
+                        <h5 class="card-title fw-bold">{{ concierto.nombre }}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">{{ concierto.artista }}</h6>
+                        <p class="card-text small">{{ concierto.descripcion }}</p>
+                        <ul class="list-unstyled small mb-0">
+                            <li><strong>Recinto:</strong> {{ concierto.lugar }}, {{ concierto.ciudad }}</li>
+                            <li><strong>Fecha:</strong> {{ concierto.fecha|date:"d/m/Y H:i" }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p>No hay conciertos registrados todavía.</p>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
