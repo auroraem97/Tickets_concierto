@@ -112,3 +112,44 @@ def concierto_delete(request, pk):
         messages.warning(request, f"Concierto '{nombre}' eliminado correctamente.")
         return redirect('conciertos_list')
         return render (request, 'Boletos/concierto_confirm_delete.html',{'concierto': concierto})
+
+# --- CRUD DE CATEGORÍAS (VIANEY) ---
+@solo_admin
+def categorias_list(request):
+    categorias = Categoria.objects.all().order_by('nombre')
+    return render(request, 'Boletos/categorias_list.html', {'categorias': categorias})
+
+@solo_admin
+def categoria_create(request):
+    if request.method == 'POST':
+        form = CategoriaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "¡Categoría creada exitosamente!")
+            return redirect('categorias_list')
+    else:
+        form = CategoriaForm()
+    return render(request, 'Boletos/categoria_form.html', {'form': form, 'titulo': 'Nueva Categoría Musical'})
+
+@solo_admin
+def categoria_edit(request, pk):
+    categoria = get_object_or_404(Categoria, pk=pk)
+    if request.method == 'POST':
+        form = CategoriaForm(request.POST, instance=categoria)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"Categoría '{categoria.nombre}' actualizada.")
+            return redirect('categorias_list')
+    else:
+        form = CategoriaForm(instance=categoria)
+    return render(request, 'Boletos/categoria_form.html', {'form': form, 'titulo': f'Editar Categoría: {categoria.nombre}'})
+
+@solo_admin
+def categoria_delete(request, pk):
+    categoria = get_object_or_404(Categoria, pk=pk)
+    if request.method == 'POST':
+        nombre = categoria.nombre
+        categoria.delete()
+        messages.warning(request, f"Categoría '{nombre}' eliminada.")
+        return redirect('categorias_list')
+    return render(request, 'Boletos/categoria_confirm_delete.html', {'categoria': categoria})

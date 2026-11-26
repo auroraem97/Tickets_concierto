@@ -31,5 +31,11 @@ urlpatterns = [
     path('conciertos/crear/', views.concierto_create, name='concierto_create'),
     path('conciertos/editar/<int:pk>/', views.concierto_edit, name='concierto_edit'),
     path('conciertos/eliminar/<int:pk>/', views.concierto_delete, name='concierto_delete'),
+
+    # CRUD Categorías (Vianey)
+    path('categorias/', views.categorias_list, name='categorias_list'),
+    path('categorias/crear/', views.categoria_create, name='categoria_create'),
+    path('categorias/editar/<int:pk>/', views.categoria_edit, name='categoria_edit'),
+    path('categorias/eliminar/<int:pk>/', views.categoria_delete, name='categoria_delete'),
 ]
 

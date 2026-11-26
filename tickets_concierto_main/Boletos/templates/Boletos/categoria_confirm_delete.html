@@ -1,0 +1,23 @@
+{% extends 'Boletos/base.html' %}
+{% block title %}Eliminar Categoría | Admin{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+        <div class="card card-dark p-4 p-md-5 text-center border-danger shadow">
+            <i class="bi bi-exclamation-triangle-fill text-danger display-3 mb-3"></i>
+            <h3 class="fw-bold">¿Eliminar esta categoría?</h3>
+            <p class="text-secondary">
+                Estás a punto de eliminar la categoría <strong class="text-white">"{{ categoria.nombre }}"</strong>. Si tiene conciertos asociados, podrían verse afectados.
+            </p>
+            <form method="POST" class="d-flex justify-content-center gap-3 mt-4">
+                {% csrf_token %}
+                <a href="{% url 'categorias_list' %}" class="btn btn-outline-light rounded-pill px-4">Cancelar</a>
+                <button type="submit" class="btn btn-danger fw-bold rounded-pill px-4">
+                    <i class="bi bi-trash-fill me-1"></i> Sí, eliminar
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
