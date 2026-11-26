@@ -153,3 +153,44 @@ def categoria_delete(request, pk):
         messages.warning(request, f"Categoría '{nombre}' eliminada.")
         return redirect('categorias_list')
     return render(request, 'Boletos/categoria_confirm_delete.html', {'categoria': categoria})
+
+# --- CRUD DE TIPOS DE BOLETOS (MAIA) ---
+@solo_admin
+def boletos_list(request):
+    boletos = TipoBoleto.objects.select_related('concierto').all().order_by('concierto__nombre', 'precio')
+    return render(request, 'Boletos/boletos_list.html', {'boletos': boletos})
+
+@solo_admin
+def boleto_create(request):
+    if request.method == 'POST':
+        form = TipoBoletoForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "¡Tipo de boleto registrado exitosamente!")
+            return redirect('boletos_list')
+    else:
+        form = TipoBoletoForm()
+    return render(request, 'Boletos/boleto_form.html', {'form': form, 'titulo': 'Nuevo Tipo de Boleto'})
+
+@solo_admin
+def boleto_edit(request, pk):
+    boleto = get_object_or_404(TipoBoleto, pk=pk)
+    if request.method == 'POST':
+        form = TipoBoletoForm(request.POST, instance=boleto)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"Boleto '{boleto.nombre}' actualizado correctamente.")
+            return redirect('boletos_list')
+    else:
+        form = TipoBoletoForm(instance=boleto)
+    return render(request, 'Boletos/boleto_form.html', {'form': form, 'titulo': f'Editar Boleto: {boleto.nombre}'})
+
+@solo_admin
+def boleto_delete(request, pk):
+    boleto = get_object_or_404(TipoBoleto, pk=pk)
+    if request.method == 'POST':
+        nombre = boleto.nombre
+        boleto.delete()
+        messages.warning(request, f"Tipo de boleto '{nombre}' eliminado.")
+        return redirect('boletos_list')
+    return render(request, 'Boletos/boleto_confirm_delete.html', {'boleto': boleto})

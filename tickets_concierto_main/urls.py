@@ -37,5 +37,11 @@ urlpatterns = [
     path('categorias/crear/', views.categoria_create, name='categoria_create'),
     path('categorias/editar/<int:pk>/', views.categoria_edit, name='categoria_edit'),
     path('categorias/eliminar/<int:pk>/', views.categoria_delete, name='categoria_delete'),
+
+    # CRUD Tipos de Boletos (Maia)
+    path('boletos/', views.boletos_list, name='boletos_list'),
+    path('boletos/crear/', views.boleto_create, name='boleto_create'),
+    path('boletos/editar/<int:pk>/', views.boleto_edit, name='boleto_edit'),
+    path('boletos/eliminar/<int:pk>/', views.boleto_delete, name='boleto_delete'),
 ]
 
