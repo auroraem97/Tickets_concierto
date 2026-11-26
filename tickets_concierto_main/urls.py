@@ -25,4 +25,11 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('dashboard/', views.dashboard_view, name='dashboard'),
+
+    # CRUD Conciertos (Wendy)
+    path('conciertos/', views.conciertos_list, name='conciertos_list'),
+    path('conciertos/crear/', views.concierto_create, name='concierto_create'),
+    path('conciertos/editar/<int:pk>/', views.concierto_edit, name='concierto_edit'),
+    path('conciertos/eliminar/<int:pk>/', views.concierto_delete, name='concierto_delete'),
 ]
+

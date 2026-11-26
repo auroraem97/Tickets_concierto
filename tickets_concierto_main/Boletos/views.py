@@ -71,3 +71,44 @@ def dashboard_view(request):
         'ultimos_conciertos': Concierto.objects.all().order_by('-id')[:5],
     }
     return render(request, 'Boletos/dashboard.html', contexto)
+
+# --- CRUD DE CONCIERTOS (WENDY) ---
+@solo_admin
+def conciertos_list(request):
+    conciertos = Concierto.objects.all().order_by('-fecha')
+    return render(request, 'Boletos/conciertos_list.html', {'conciertos': conciertos})
+
+@solo_admin
+def concierto_create(request):
+    if request.method == 'POST':
+        form = ConciertoForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "¡Concierto registrado exitosamente!")
+            return redirect('conciertos_list')
+    else:
+        form = ConciertoForm()
+    return render(request, 'Boletos/concierto_form.html', {'form': form, 'titulo': 'Registrar Nuevo Concierto'})
+
+@solo_admin
+def concierto_edit(request, pk):
+    concierto = get_object_or_404(Concierto, pk=pk)
+    if request.method == 'POST':
+        form = ConciertoForm(request.POST, instance=concierto)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"El concierto '{concierto.nombre}' fue actualizado.")
+            return redirect('conciertos_list')
+    else:
+        form = ConciertoForm(instance=concierto)
+    return render(request, 'Boletos/concierto_form.html', {'form': form, 'titulo': f'Editar Concierto: {concierto.nombre}'})
+
+@solo_admin
+def concierto_delete(request, pk):
+    concierto = get_object_or_404(Concierto, pk=pk)
+    if request.method == 'POST':
+        nombre = concierto.nombre
+        concierto.delete()
+        messages.warning(request, f"Concierto '{nombre}' eliminado correctamente.")
+        return redirect('conciertos_list')
+        return render (request, 'Boletos/concierto_confirm_delete.html',{'concierto': concierto})
