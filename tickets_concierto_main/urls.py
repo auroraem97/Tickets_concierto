@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from Boletos import views
+from tickets_concierto_main.Boletos import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),

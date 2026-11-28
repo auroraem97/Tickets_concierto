@@ -1,41 +1,170 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Catálogo | Tickets Concierto</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
-    <nav class="navbar navbar-dark bg-dark px-4">
-        <span class="navbar-brand fw-bold text-warning">Tickets Concierto</span>
-        <div class="d-flex align-items-center gap-3 text-white">
-            <span>Hola, <strong>{{ request.user.username }}</strong></span>
-            <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm">Cerrar Sesión</a>
-        </div>
-    </nav>
+{% extends 'Boletos/base.html' %}
+{% block title %}Cartelera de Conciertos | Tickets Concierto{% endblock %}
 
-    <div class="container my-5">
-        <h2 class="mb-4 fw-bold">Conciertos Disponibles</h2>
-        <div class="row g-4">
-            {% for concierto in conciertos %}
-            <div class="col-md-4">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body">
-                        <span class="badge bg-primary mb-2">{{ concierto.categoria.nombre }}</span>
-                        <h5 class="card-title fw-bold">{{ concierto.nombre }}</h5>
-                        <h6 class="card-subtitle mb-2 text-muted">{{ concierto.artista }}</h6>
-                        <p class="card-text small">{{ concierto.descripcion }}</p>
-                        <ul class="list-unstyled small mb-0">
-                            <li><strong>Recinto:</strong> {{ concierto.lugar }}, {{ concierto.ciudad }}</li>
-                            <li><strong>Fecha:</strong> {{ concierto.fecha|date:"d/m/Y H:i" }}</li>
-                        </ul>
-                    </div>
-                </div>
+{% block content %}
+<!-- Banner Principal (Hero) -->
+<div class="p-4 p-md-5 mb-5 rounded-4 shadow-lg text-center position-relative overflow-hidden"
+     style="background: linear-gradient(135deg, #1e1b4b 0%, #311042 50%, #0f172a 100%); border: 1px solid rgba(245, 158, 11, 0.3);">
+    <span class="badge bg-warning text-dark fw-bold px-3 py-2 rounded-pill mb-3">
+        <i class="bi bi-stars me-1"></i> TEMPORADA DE CONCIERTOS 2026
+    </span>
+    <h1 class="display-5 fw-extrabold text-white mb-2">Vive la Música en Vivo</h1>
+    <p class="lead text-light opacity-75 mx-auto mb-4" style="max-width: 650px;">
+        Explora los próximos eventos, filtra por tu género favorito y consulta disponibilidad de zonas VIP y General al instante.
+    </p>
+
+    <!-- Buscador en tiempo real -->
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="input-group input-group-lg shadow">
+                <span class="input-group-text bg-dark text-warning border-secondary">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text" id="buscadorEventos" class="form-control bg-dark text-white border-secondary"
+                       placeholder="Buscar por artista, nombre del tour o ciudad...">
             </div>
-            {% empty %}
-            <p>No hay conciertos registrados todavía.</p>
-            {% endfor %}
         </div>
     </div>
-</body>
-</html>
+
+    {% if request.user.is_staff %}
+    <div class="mt-4 pt-2">
+        <a href="{% url 'dashboard' %}" class="btn btn-warning fw-bold rounded-pill px-4 me-2">
+            <i class="bi bi-speedometer2 me-1"></i> Ir al Dashboard Admin
+        </a>
+        <a href="{% url 'concierto_create' %}" class="btn btn-outline-light rounded-pill px-4">
+            <i class="bi bi-plus-circle me-1"></i> Agregar Evento
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Filtros Rápidos por Categoría -->
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
+    <div class="d-flex flex-wrap gap-2" id="filtrosCategoria">
+        <button class="btn btn-warning btn-sm fw-bold rounded-pill px-3 filtro-btn active" data-categoria="todas">
+            Todos los Géneros
+        </button>
+        {% for cat in categorias %}
+        <button class="btn btn-outline-light btn-sm rounded-pill px-3 filtro-btn" data-categoria="{{ cat.nombre|lower }}">
+            {{ cat.nombre }}
+        </button>
+        {% endfor %}
+    </div>
+    <span class="text-secondary small" id="contadorResultados">Mostrando todos los eventos</span>
+</div>
+
+<!-- Cuadrícula de Conciertos -->
+<div class="row g-4" id="listaConciertos">
+    {% for c in conciertos %}
+    <div class="col-md-6 col-lg-4 tarjeta-concierto"
+         data-texto="{{ c.nombre|lower }} {{ c.artista|lower }} {{ c.ciudad|lower }} {{ c.lugar|lower }}"
+         data-categoria="{{ c.categoria.nombre|lower }}">
+        <div class="card card-dark h-100 shadow-sm overflow-hidden d-flex flex-column transition-card">
+            <!-- Encabezado visual de la tarjeta -->
+            <div class="p-3 d-flex justify-content-between align-items-center"
+                 style="background: linear-gradient(90deg, rgba(245,158,11,0.18), rgba(236,72,153,0.18)); border-bottom: 1px solid rgba(255,255,255,0.08);">
+                <span class="badge bg-info text-dark fw-bold">{{ c.categoria.nombre }}</span>
+                <span class="text-warning small fw-semibold">
+                    <i class="bi bi-calendar3 me-1"></i> {{ c.fecha|date:"d M Y • H:i" }}
+                </span>
+            </div>
+
+            <div class="card-body d-flex flex-column p-4">
+                <h4 class="fw-bold text-white mb-1">{{ c.nombre }}</h4>
+                <p class="text-warning fw-semibold mb-3">
+                    <i class="bi bi-mic-fill me-1"></i> {{ c.artista }}
+                </p>
+
+                <p class="text-secondary small mb-3">
+                    <i class="bi bi-geo-alt-fill text-danger me-1"></i> {{ c.lugar }}, <strong>{{ c.ciudad }}</strong>
+                </p>
+
+                {% if c.descripcion %}
+                <p class="small text-light opacity-75 mb-3">{{ c.descripcion|truncatewords:18 }}</p>
+                {% endif %}
+
+                <!-- Zonas y Precios disponibles -->
+                <div class="mt-auto pt-3 border-top border-secondary border-opacity-25">
+                    <span class="d-block text-secondary small fw-bold mb-2">Boletos disponibles:</span>
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        {% for b in c.tipoboleto_set.all %}
+                            <span class="badge bg-dark border border-success text-success px-2 py-1">
+                                {{ b.nombre }}: ${{ b.precio }} ({{ b.stock }})
+                            </span>
+                        {% empty %}
+                            <span class="badge bg-secondary bg-opacity-25 text-secondary">Próximamente a la venta</span>
+                        {% endfor %}
+                    </div>
+
+                    {% if request.user.is_staff %}
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'concierto_edit' c.id %}" class="btn btn-sm btn-outline-info w-50 rounded-pill">
+                            <i class="bi bi-pencil"></i> Editar
+                        </a>
+                        <a href="{% url 'concierto_delete' c.id %}" class="btn btn-sm btn-outline-danger w-50 rounded-pill">
+                            <i class="bi bi-trash"></i> Eliminar
+                        </a>
+                    </div>
+                    {% else %}
+                    <button class="btn btn-warning w-100 fw-bold rounded-pill" onclick="alert('Módulo de reservación habilitado para {{ c.nombre|escapejs }}.')">
+                        <i class="bi bi-ticket-perforated me-1"></i> Ver Disponibilidad
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="card card-dark p-5 text-center">
+            <i class="bi bi-music-note-list display-3 text-secondary mb-3"></i>
+            <h4 class="fw-bold">No hay conciertos programados aún</h4>
+            <p class="text-secondary mb-0">Vuelve pronto para conocer las próximas fechas.</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Script de Búsqueda y Filtro Dinámico -->
+<script>
+    const buscador = document.getElementById('buscadorEventos');
+    const botonesFiltro = document.querySelectorAll('.filtro-btn');
+    const tarjetas = document.querySelectorAll('.tarjeta-concierto');
+    const contador = document.getElementById('contadorResultados');
+    let categoriaActiva = 'todas';
+
+    function filtrarEventos() {
+        const texto = buscador.value.toLowerCase().trim();
+        let visibles = 0;
+
+        tarjetas.forEach(tarjeta => {
+            const coincideTexto = tarjeta.dataset.texto.includes(texto);
+            const coincideCat = (categoriaActiva === 'todas') || (tarjeta.dataset.categoria === categoriaActiva);
+
+            if (coincideTexto && coincideCat) {
+                tarjeta.style.display = 'block';
+                visibles++;
+            } else {
+                tarjeta.style.display = 'none';
+            }
+        });
+
+        contador.textContent = `Mostrando ${visibles} evento(s)`;
+    }
+
+    buscador.addEventListener('input', filtrarEventos);
+
+    botonesFiltro.forEach(boton => {
+        boton.addEventListener('click', () => {
+            botonesFiltro.forEach(b => {
+                b.classList.remove('btn-warning', 'fw-bold', 'active');
+                b.classList.add('btn-outline-light');
+            });
+            boton.classList.remove('btn-outline-light');
+            boton.classList.add('btn-warning', 'fw-bold', 'active');
+            categoriaActiva = boton.dataset.categoria;
+            filtrarEventos();
+        });
+    });
+</script>
+{% endblock %}
